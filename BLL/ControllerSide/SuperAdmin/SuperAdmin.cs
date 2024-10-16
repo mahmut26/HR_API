@@ -6,6 +6,7 @@ using BLL.Services;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,12 @@ namespace BLL.ControllerSide.SuperAdmin
 
         public async Task<string> RegisterUser(string email, string password, string companyName)
         {
+            var isHere = (await _unitOfWork.companyData.GetAllAsync()).FirstOrDefault(x=>x.CompanyName== companyName);
+            
+            if (isHere != null) 
+            {
+                return "Company is already created!";
+            }
             await _unitOfWork.companyData.AddAsync(new CompanyData { CompanyName = companyName });
 
             await _unitOfWork.SaveAsync();
@@ -50,6 +57,13 @@ namespace BLL.ControllerSide.SuperAdmin
 
                 CompanyName = companyName
             };
+
+            var isHereUser= await _userManager.FindByEmailAsync(email);
+
+            if (isHereUser != null) 
+            {
+                return "User is already created !!";
+            }
 
             var result = await _userManager.CreateAsync(user, password);
 

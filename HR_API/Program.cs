@@ -26,6 +26,16 @@ namespace HR_API
 
             // Add services to the container.
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                {
+                    builder.WithOrigins("http://localhost:3000") 
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
             builder.Services.AddControllers()
                 .AddNewtonsoftJson(options =>
                 {
@@ -88,6 +98,7 @@ namespace HR_API
                 };
             });
 
+
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequireSuperAdminRole", policy => policy.RequireRole("SuperAdmin"));
@@ -102,7 +113,7 @@ namespace HR_API
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-
+            app.UseCors("AllowSpecificOrigin");
 
             using (var scope = app.Services.CreateScope())
             {
